@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en" data-theme="day">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="radio-stats-api" content="">
+  <meta name="theme-color" content="#f3f5ef">
+  <meta name="description" content="Discover and listen to live radio stations from around the world with Radio Atlas." data-i18n-content="description">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="./styles.css">
+  <title>Radio Atlas</title>
+</head>
+<body>
+  <a class="skip-link" href="#stations" data-i18n="skip">Skip to stations</a>
+  <div class="layout">
+    <aside class="sidebar" aria-label="Navigation" data-i18n-label="navigation">
+      <a class="brand" href="./" aria-label="Radio Atlas, home" data-i18n-label="home">
+        <img src="./icons/icon-192.png" width="40" height="40" alt="">
+        <strong data-i18n="appName">Radio Atlas</strong>
+      </a>
+      <nav class="nav">
+        <button type="button" data-view="discover" aria-current="page"><span data-icon="compass"></span><span data-i18n="discover">Discover</span></button>
+        <button type="button" data-view="countries"><span data-icon="globe"></span><span data-i18n="countries">Countries</span></button>
+        <button type="button" data-view="favorites"><span data-icon="heart"></span><span data-i18n="favorites">Favorites</span></button>
+      </nav>
+      <div class="side-foot">
+        <button type="button" class="quiet" data-install><span data-icon="download"></span><span data-i18n="install">Install</span></button>
+        <p><span data-i18n="dataFrom">Data from</span> <a href="https://www.radio-browser.info/" target="_blank" rel="noopener noreferrer">Radio Browser</a></p>
+      </div>
+    </aside>
+    <main>
+      <header class="topbar">
+        <p class="breadcrumb"><span data-icon="compass"></span> <span id="breadcrumb">Discover</span></p>
+        <div class="top-actions">
+          <button class="icon-button" type="button" data-install aria-label="Install" data-i18n-label="install" title="Install" data-i18n-title="install"><span data-icon="download"></span></button>
+          <button class="icon-button" id="volume-mobile" type="button" aria-label="Volume" data-i18n-label="volume" title="Volume" data-i18n-title="volume"><span data-icon="volume"></span></button>
+          <button id="language-button" class="theme-button" type="button" aria-haspopup="dialog" aria-label="Language" data-i18n-label="language" title="Language" data-i18n-title="language"><span data-icon="language"></span><span id="language-code">EN</span></button>
+          <button id="theme-button" class="theme-button" aria-label="Theme" data-i18n-label="theme" title="Theme" data-i18n-title="theme" type="button" aria-haspopup="dialog"><span data-icon="palette"></span><span data-i18n="theme">Theme</span></button>
+        </div>
+      </header>
+      <div class="content">
+        <section class="hero" id="hero" aria-labelledby="hero-title">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="signal-dot"></span><span data-i18n="liveRadio">LIVE RADIO</span></p>
+            <h1 id="hero-title"><span data-i18n="heroFirst">The world</span> <em data-i18n="heroSecond">is on air.</em></h1>
+            <p class="hero-description" data-i18n="heroDescription">Discover stations from 249 countries and territories. Pick a frequency and listen live.</p>
+            <div class="hero-actions">
+              <button type="button" class="primary-button" id="hero-browse"><span data-icon="compass"></span><span data-i18n="findStations">Find stations</span></button>
+              <button type="button" class="hero-secondary" id="resume" hidden><span data-icon="play"></span><span id="resume-label">Last station</span></button>
+            </div>
+          </div>
+        </section>
+        <div class="main-grid" id="main-grid">
+          <section id="stations" class="stations-panel" aria-labelledby="stations-title" tabindex="-1">
+            <div class="section-heading">
+              <div>
+                <h2 id="stations-title">Stations</h2>
+                <p id="station-subtitle">Choose what to listen to</p>
+              </div>
+              <button type="button" id="choose-country" class="pill"><span data-icon="globe"></span><span id="station-country">Bulgaria</span><span data-icon="chevron-down"></span></button>
+            </div>
+            <div class="toolbar">
+              <label class="search"><span data-icon="search"></span><input type="search" id="station-search" autocomplete="off" placeholder="Search stations" data-i18n-placeholder="searchStation" aria-label="Search stations" data-i18n-label="searchStation"></label>
+              <label class="sort"><span data-icon="sort"></span><select id="station-sort" aria-label="Sort stations" data-i18n-label="stationSort"><option value="popular" data-i18n="popular">Most popular</option><option value="name" data-i18n="byName">By name</option></select></label>
+            </div>
+            <div class="station-list" id="station-list" aria-busy="true"></div>
+            <div class="station-footer"><div><span id="station-count" role="status"></span><small id="live-total" hidden></small></div><button id="show-more" type="button" class="quiet" hidden><span data-i18n="showMore">More stations</span> <span data-icon="chevron-down"></span></button></div>
+          </section>
+          <section class="country-panel" id="countries" aria-labelledby="countries-title" tabindex="-1">
+            <div class="section-heading">
+              <div><h2 id="countries-title" data-i18n="countries">Countries</h2><p data-i18n="countryCount">249 countries and territories</p></div>
+              <button type="button" id="all-countries" class="icon-button" aria-label="All countries" data-i18n-label="allCountries" title="All countries" data-i18n-title="allCountries"><span data-icon="arrow"></span></button>
+            </div>
+            <label class="search country-search"><span data-icon="search"></span><input type="search" id="country-search" autocomplete="off" placeholder="Search countries" data-i18n-placeholder="searchCountry" aria-label="Search countries" data-i18n-label="searchCountry"></label>
+            <div id="country-tools" hidden><label class="sort"><span data-icon="sort"></span><select id="country-sort" aria-label="Sort countries" data-i18n-label="countrySort"><option value="featured" data-i18n="featured">Featured</option><option value="name" data-i18n="byName">By name</option><option value="stations" data-i18n="byStationCount">By station count</option></select></label></div>
+            <div class="country-list" id="country-list"></div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer id="player" class="player" aria-label="Radio player" data-i18n-label="radioPlayer">
+    <div class="now-playing">
+      <span class="player-cover" id="player-cover"><span data-icon="radio"></span></span>
+      <div class="track-copy"><strong id="track-name">No station selected</strong><span id="track-meta" role="status">Pick a station from the directory</span></div>
+      <button type="button" class="icon-button" id="player-favorite" aria-label="Add to favorites" disabled><span data-icon="heart"></span></button>
+    </div>
+    <div class="transport">
+      <button type="button" class="icon-button" id="previous" aria-label="Previous station" data-i18n-label="previous" disabled><span data-icon="previous"></span></button>
+      <button type="button" class="player-play" id="play" aria-label="Play" disabled><span data-icon="play"></span></button>
+      <button type="button" class="icon-button" id="next" aria-label="Next station" data-i18n-label="next" disabled><span data-icon="next"></span></button>
+    </div>
+    <div class="volume" id="volume-panel">
+      <button type="button" class="icon-button" id="mute" aria-label="Mute"><span data-icon="volume"></span></button>
+      <input type="range" id="volume" min="0" max="100" value="75" aria-label="Volume" data-i18n-label="volume">
+    </div>
+    <audio id="audio" preload="none" playsinline></audio>
+  </footer>
+  <dialog id="language-dialog" aria-labelledby="language-title">
+    <div class="dialog-head"><h2 id="language-title" data-i18n="chooseLanguage">Interface language</h2><form method="dialog"><button class="icon-button" aria-label="Close" data-i18n-label="close"><span data-icon="close"></span></button></form></div>
+    <div id="language-options" class="theme-options" role="group" aria-label="Interface language" data-i18n-label="chooseLanguage"></div>
+  </dialog>
+  <dialog id="theme-dialog">
+    <div class="dialog-head"><h2 data-i18n="chooseTheme">Color theme</h2><form method="dialog"><button class="icon-button" aria-label="Close" data-i18n-label="close"><span data-icon="close"></span></button></form></div>
+    <div class="theme-options" role="group" aria-label="Color theme" data-i18n-label="chooseTheme">
+      <button type="button" data-theme-choice="day"><span class="swatch swatch-day"></span><span data-i18n="day">Light</span></button>
+      <button type="button" data-theme-choice="night"><span class="swatch swatch-night"></span><span data-i18n="night">Dark</span></button>
+      <button type="button" data-theme-choice="dusk"><span class="swatch swatch-dusk"></span><span data-i18n="dusk">Dusk</span></button>
+      <button type="button" data-theme-choice="contrast"><span class="swatch swatch-contrast"></span><span data-i18n="contrast">High contrast</span></button>
+    </div>
+  </dialog>
+  <dialog id="volume-dialog">
+    <div class="dialog-head"><h2 data-i18n="volume">Volume</h2><form method="dialog"><button class="icon-button" aria-label="Close" data-i18n-label="close"><span data-icon="close"></span></button></form></div>
+    <div class="mobile-volume-controls"><button type="button" id="mobile-mute" class="icon-button" aria-label="Mute"><span data-icon="volume"></span></button><input type="range" id="mobile-range" min="0" max="100" value="75" aria-label="Volume" data-i18n-label="volume"></div>
+  </dialog>
+  <dialog id="install-dialog">
+    <div class="dialog-head"><h2 data-i18n="installTitle">Install Radio Atlas</h2><form method="dialog"><button class="icon-button" aria-label="Close" data-i18n-label="close"><span data-icon="close"></span></button></form></div>
+    <p id="install-status" hidden></p>
+    <dl>
+      <dt>iPhone / iPad</dt><dd data-i18n="installIOS">In Safari, choose Share, then Add to Home Screen. Turn on Open as Web App if shown.</dd>
+      <dt>Android</dt><dd data-i18n="installAndroid">In the Chrome menu, choose Install app or Add to Home screen.</dd>
+      <dt>Mac</dt><dd data-i18n="installMac">In Safari, choose File → Add to Dock.</dd>
+    </dl>
+  </dialog>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
