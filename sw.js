@@ -1,6 +1,6 @@
 const APP_URL = new URL(self.registration.scope);
 const CACHE_PREFIX = `radio-atlas:${APP_URL.href}:`;
-const CACHE_VERSION = '4';
+const CACHE_VERSION = '5';
 const SHELL_CACHE = `${CACHE_PREFIX}shell-${CACHE_VERSION}`;
 const CATALOG_CACHE = `${CACHE_PREFIX}catalog-2`;
 const SHELL_PATHS = new Set([
@@ -48,31 +48,31 @@ async function appShellResponse(request, path) {
 
 async function catalogResponse(request) {
   const path = new URL(request.url).pathname;
-  const expectedType = path.endsWith('.json') ? 'json'
+  const refresh = path.endsWith('.json');
+  const expectedType = refresh ? 'json'
     : path.endsWith('.png') ? 'image/png'
       : 'javascript';
-  let cache;
+  let cache, stored;
   try {
     cache = await caches.open(CATALOG_CACHE);
-    const stored = await cache.match(request);
-    if (stored) return stored;
+    stored = await cache.match(request);
+    if (stored && !refresh) return stored;
   } catch {
     // Storage can be unavailable in private mode or at quota.
   }
   try {
-    const response = await fetch(request);
-    if (response.ok && cache) {
-      if (response.headers.get('Content-Type')?.includes(expectedType)) {
-        try {
-          await cache.put(request, response.clone());
-        } catch {
-          // The live response is still useful when the cache is full.
-        }
-      }
+    const response = await fetch(request, refresh ? { cache: 'no-cache' } : undefined);
+    if (!response.ok || !response.headers.get('Content-Type')?.includes(expectedType)) {
+      return stored || response;
+    }
+    try {
+      await cache?.put(request, response.clone());
+    } catch {
+      // The live response is still useful when the cache is full.
     }
     return response;
   } catch {
-    return new Response('Resource unavailable offline.', { status: 503 });
+    return stored || new Response('Resource unavailable offline.', { status: 503 });
   }
 }
 

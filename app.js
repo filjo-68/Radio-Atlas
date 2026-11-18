@@ -258,7 +258,8 @@ function renderStations() {
     start.append(art, copy, indicator);
     start.addEventListener('click', () => {
       playlist = filtered.slice();
-      if (player.state.station?.id === station.id) player.toggle();
+      const current = player.state;
+      if (current.station?.id === station.id && ['playing', 'loading'].includes(current.status)) player.pause();
       else player.play(station);
     });
     const favorite = item('button', 'icon-button favorite');
@@ -374,6 +375,37 @@ async function step(direction) {
   player.play(choices[(index + direction + choices.length) % choices.length]);
 }
 
+function refreshSavedStations(records) {
+  let favoritesChanged = false;
+  const { lastStation, station: selected } = player.state;
+  for (const station of records) {
+    const favorite = favorites.get(station.id);
+    if (favorite && JSON.stringify(favorite) !== JSON.stringify(station)) {
+      favorites.set(station.id, station);
+      favoritesChanged = true;
+    }
+    if (station.id === lastStation?.id || station.id === selected?.id) player.refreshStation(station);
+  }
+  if (favoritesChanged) {
+    save(favoriteKey, [...favorites.values()]);
+    if (view === 'favorites') renderStations();
+  }
+}
+
+async function refreshSavedCountry(code) {
+  if (!countryByCode.has(code)) return;
+  try {
+    refreshSavedStations(await loadStations(code));
+  } catch {
+    // Keep using the locally saved station details when the catalog is unavailable.
+  }
+}
+
+async function refreshFavoriteCountries() {
+  const codes = new Set([...favorites.values()].map(station => station.country));
+  for (const code of codes) await refreshSavedCountry(code);
+}
+
 async function chooseCountry(code) {
   if (!countryByCode.has(code)) return;
   selectedCode = code;
@@ -389,6 +421,7 @@ async function chooseCountry(code) {
     const result = await loadStations(selectedCode);
     if (version !== loadVersion) return;
     stations = result;
+    refreshSavedStations(stations);
   } catch {
     if (version !== loadVersion) return;
     loadError = true;
@@ -420,6 +453,7 @@ function display(next, code = selectedCode) {
   if (codeChanged || (!stations.length && !pending && !isFavorites && !isCountries)) chooseCountry(code);
   else renderStations();
   renderCountries();
+  if (isFavorites) void refreshFavoriteCountries();
 }
 
 function route() {
@@ -609,6 +643,7 @@ if (favoritesMigrating) {
 
 applyLanguage();
 display(...route());
+void refreshSavedCountry(player.state.lastStation?.country);
 
 if ('serviceWorker' in navigator && window.isSecureContext) {
   navigator.serviceWorker.addEventListener('controllerchange', () => {

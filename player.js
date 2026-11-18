@@ -275,6 +275,24 @@ export function createPlayer(audio, { onChange, onNext, onPrevious, artwork = AP
     return play(station || lastStation);
   }
 
+  function refreshStation(input) {
+    const refreshLast = lastStation?.id === input.id;
+    const refreshSelected = station?.id === input.id && status !== "playing" && status !== "loading";
+    if (!refreshLast && !refreshSelected) return;
+    const updated = cleanStation(input);
+    if (!updated) return;
+
+    if (refreshLast) {
+      lastStation = updated;
+      savePreference(LAST_STATION, JSON.stringify(updated));
+    }
+    if (refreshSelected) {
+      station = updated;
+      setMetadata();
+    }
+    emit();
+  }
+
   function setMuted(value) {
     const next = Boolean(value);
     if (muted === next) return;
@@ -377,6 +395,7 @@ export function createPlayer(audio, { onChange, onNext, onPrevious, artwork = AP
     toggle,
     setVolume,
     refreshMetadata: setMetadata,
+    refreshStation,
     setMuted,
     toggleMute: () => setMuted(!muted)
   };
